@@ -12,6 +12,28 @@ router.get('/', (req, res) => {
     });
 });
 
+
+// Get user by ID
+router.get('/:id', (req, res) => {
+    User.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    .then(dbUserData => {
+        if (!dbUserData) {
+            res.status(404).json({ message: 'No user found with this id' });
+            return;
+        }
+        res.json(dbUserData);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    });
+})
+
+
 // Create a new user
 router.post('/', (req, res) => {
     User.create({
