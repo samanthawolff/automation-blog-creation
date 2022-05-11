@@ -1,5 +1,5 @@
 const express = require('express');
-//const routes = require('./controllers');
+const routes = require('./controllers');
 const sequelize = require('./config/connection');
 
 
@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // Turn on routes
-//app.use(routes);
+app.use(routes);
 
 // Turn on connection to db and server
 sequelize.sync({ force: false }).then(() => {
