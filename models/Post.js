@@ -1,9 +1,11 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
-const { post } = require('../controllers/api/user-routes');
 
 
-post.init(
+class Post extends Model {}
+
+
+Post.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -15,11 +17,11 @@ post.init(
             type: DataTypes.STRING,
             allowNull: false
         },
-        post_url: {
-            type: DataTypes.STRING,
+        post_text: {
+            type: DataTypes.TEXT,
             allowNull: false,
             validate: {
-                isURL: true
+                len: [1]
             }
         },
         user_id: {
@@ -37,3 +39,6 @@ post.init(
         modelName: 'post'
     }
 );
+
+
+module.exports = Post;
