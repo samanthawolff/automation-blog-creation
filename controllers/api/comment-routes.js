@@ -1,10 +1,28 @@
 const router = require('express').Router();
-const { Comment } = require('../../models');
+const { Comment, User } = require('../../models');
+const { sequelize } = require('../../models/User');
+const withAuth = require('../../utils/auth');
 
 
 // Get all comments
 router.get('/', (req, res) => {
-    Comment.findAll()
+    Comment.findAll({
+        order:[['created_at', 'DESC']],
+        attributes: [
+            'id',
+            'comment_text',
+            'user_id',
+            'post_id',
+            'created_at',
+            [sequelize.literal('(SELECT COUNT(*) FROM comment WHERE comment.id = comment.post_id)'), 'comment_count']
+        ],
+        include: [
+            {
+                model: User,
+                attributes: ['username']
+            }
+        ]
+    })
     .then(dbCommentData => res.json(dbCommentData))
     .catch(err => {
         console.log(err);
@@ -24,6 +42,27 @@ router.post('/', (req, res) => {
     .catch(err => {
         console.log(err);
         res.status(400).json(err);
+    });
+});
+
+
+// Delete a comment
+router.delete('/:id', withAuth, (req, res) => {
+    Comment.destroy({
+        where: {
+            id: req.params.id
+        }
+    })
+    .then(dbCommentData => {
+        if (!dbCommentData) {
+            res.status(404).json({ message: 'No comment found with this id' });
+            return;
+        }
+        res.json(dbCommentData);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
     });
 });
 
